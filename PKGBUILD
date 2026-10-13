@@ -1,5 +1,7 @@
-# Maintainer: Sven-Hendrik Haase <svenstaro@archlinux.org>
-# Maintainer: Peter Jung <ptr1337@archlinux.org>
+# Original Arch maintainers:
+# Sven-Hendrik Haase <svenstaro@archlinux.org>
+# Peter Jung <ptr1337@archlinux.org>
+# Maintainer: Jappe02 <Jappe00001@gmail.com>
 # Contributor: James Rayner <iphitus@gmail.com>
 # Contributor: Vasiliy Stelmachenok <ventureo@yandex.ru>
 # Contributor: Thomas Baechler <thomas@archlinux.org>
@@ -20,7 +22,7 @@ source=('nvidia-drm-outputclass.conf'
         'nvidia.rules'
         'systemd-homed-override.conf'
         'systemd-suspend-override.conf'
-        'nvidia-utils.conf'
+        'nvidia-open-dkms.conf'
         "https://download.nvidia.com/XFree86/NVIDIA-kernel-module-source/${_pkg_open}.tar.xz")
 sha512sums=('de7116c09f282a27920a1382df84aa86f559e537664bb30689605177ce37dc5067748acf9afd66a3269a6e323461356592fdfc624c86523bf105ff8fe47d3770'
             '1bcf2c6ee71686c0d32625e746ec8c0f7cf42fc63c76c3076ff2526b2661e8b9e9f76eaa2c4b213c7cc437a6f06006cc07672c4974d7f4515b2de2fd7c47a891'
@@ -281,10 +283,6 @@ package_nvidia-utils() {
 
     install -Dm644 "${srcdir}/nvidia.rules" "$pkgdir"/usr/lib/udev/rules.d/60-nvidia.rules
 
-    # Enable kernel suspend notifiers for open modules and override TemporaryFilePath
-    # from default /tmp to /var/tmp
-    install -Dm644 "${srcdir}/nvidia-utils.conf" "${pkgdir}/usr/lib/modprobe.d/nvidia-utils.conf"
-
     # Lists NVIDIA driver files for container runtimes like nvidia-container-toolkit
     install -Dm644 sandboxutils-filelist.json "${pkgdir}/usr/share/nvidia/files.d/sandboxutils-filelist.json"
 
@@ -292,16 +290,20 @@ package_nvidia-utils() {
 }
 
 package_nvidia-open-dkms() {
-  pkgdesc="NVIDIA open kernel modules - module sources"
-  depends+=('dkms' "nvidia-utils=$pkgver")
-  license=('MIT AND GPL-2.0-only')
-  conflicts=('nvidia-open' 'NVIDIA-MODULE')
-  provides=('nvidia-open' 'NVIDIA-MODULE' 'nvidia-dkms')
-  replaces=('nvidia-dkms')
+    pkgdesc="NVIDIA open kernel modules - module sources"
+    depends+=('dkms' "nvidia-utils=$pkgver")
+    license=('MIT AND GPL-2.0-only')
+    conflicts=('nvidia-open' 'NVIDIA-MODULE')
+    provides=('nvidia-open' 'NVIDIA-MODULE' 'nvidia-dkms')
+    replaces=('nvidia-dkms')
 
-  install -dm 755 "${pkgdir}/usr/src"
-  cp -dr --no-preserve='ownership' "${srcdir}/${_pkg_open}" "${pkgdir}/usr/src/nvidia-$pkgver"
-  mv "${pkgdir}/usr/src/nvidia-$pkgver/kernel-open/dkms.conf" "${pkgdir}/usr/src/nvidia-$pkgver/dkms.conf"
+    install -dm 755 "${pkgdir}/usr/src"
+    cp -dr --no-preserve='ownership' "${srcdir}/${_pkg_open}" "${pkgdir}/usr/src/nvidia-$pkgver"
+    mv "${pkgdir}/usr/src/nvidia-$pkgver/kernel-open/dkms.conf" "${pkgdir}/usr/src/nvidia-$pkgver/dkms.conf"
 
-  install -Dm644 "${srcdir}/${_pkg_open}/COPYING" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+    # Enable kernel suspend notifiers for open modules and override TemporaryFilePath
+    # from default /tmp to /var/tmp
+    install -Dm644 "${srcdir}/nvidia-open-dkms.conf" "${pkgdir}/usr/lib/modprobe.d/nvidia-open-dkms.conf"
+
+    install -Dm644 "${srcdir}/${_pkg_open}/COPYING" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
