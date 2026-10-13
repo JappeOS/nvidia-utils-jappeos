@@ -8,7 +8,7 @@
 
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'opencl-nvidia' 'nvidia-open-dkms')
-pkgver=615.78.08
+pkgver=615.78.09
 pkgrel=1
 arch=('aarch64' 'x86_64')
 url="https://www.nvidia.com/"
