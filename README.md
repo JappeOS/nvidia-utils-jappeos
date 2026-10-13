@@ -4,7 +4,7 @@
 </h1>
 
 <p align="center">
-  <strong>Packaging for 'nvidia-utils', 'opencl-nvidia' and 'nvidia-open-dkms' for JappeOS.</strong>
+  <strong>Packaging for `nvidia-utils`, `opencl-nvidia` and `nvidia-open-dkms` for JappeOS.</strong>
 </p>
 
 <p align="center">
@@ -20,11 +20,11 @@
 
 ## Overview
 
-Packaging for 'nvidia-utils', 'opencl-nvidia' and 'nvidia-open-dkms' for JappeOS.
+Packaging for `nvidia-utils`, `opencl-nvidia` and `nvidia-open-dkms` for JappeOS.
 This is just a packaging repository for the package manager, not a source repo.
 
-This packaging repository provides modified versions of the 'nvidia-utils', 'opencl-nvidia' and
-'nvidia-open-dkms' packages. The main purpose of these modifications is to solve an issue where
+This packaging repository provides modified versions of the `nvidia-utils`, `opencl-nvidia` and
+`nvidia-open-dkms` packages. The main purpose of these modifications is to solve an issue where
 the `nvidia-utils` package installed a configuration that blacklisted the `nouveau` driver from loading.
 But `nvidia-utils` is just a utility library and not the driver itself, which causes a situation
 where the `nouveau` driver cannot load because it is blacklisted, and the proprietary driver
@@ -33,7 +33,7 @@ blacklisted when the proprietary driver (`nvidia-open-dkms`) is actually install
 
 ## Features
 
-* Provides improved versions of 'nvidia-utils', 'opencl-nvidia' and 'nvidia-open-dkms' packages for JappeOS.
+* Provides improved versions of `nvidia-utils`, `opencl-nvidia` and `nvidia-open-dkms` packages for JappeOS.
 
 ## Role in the OS
 
