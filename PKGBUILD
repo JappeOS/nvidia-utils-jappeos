@@ -8,8 +8,12 @@
 
 pkgbase=nvidia-utils
 pkgname=('nvidia-utils' 'opencl-nvidia' 'nvidia-open-dkms')
+# NVIDIA only ships x86 compatibility libraries in the x86_64 installer.
+if [[ ${CARCH} == x86_64 ]]; then
+    pkgname+=('lib32-nvidia-utils' 'lib32-opencl-nvidia')
+fi
 pkgver=615.78.08
-pkgrel=1
+pkgrel=2
 arch=('aarch64' 'x86_64')
 url="https://www.nvidia.com/"
 license=('LicenseRef-NVIDIA-Driver-License-Agreement')
@@ -306,4 +310,54 @@ package_nvidia-open-dkms() {
     install -Dm644 "${srcdir}/nvidia-open-dkms.conf" "${pkgdir}/usr/lib/modprobe.d/nvidia-open-dkms.conf"
 
     install -Dm644 "${srcdir}/${_pkg_open}/COPYING" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
+
+package_lib32-nvidia-utils() {
+    pkgdesc="NVIDIA drivers utilities (32-bit)"
+    arch=('x86_64')
+    depends=('lib32-zlib' 'lib32-gcc-libs' 'lib32-libglvnd' "nvidia-utils=${pkgver}")
+    optdepends=('lib32-opencl-nvidia: OpenCL support (32-bit)')
+    provides=('lib32-vulkan-driver' 'lib32-opengl-driver' 'lib32-nvidia-libgl')
+    conflicts=('lib32-nvidia-libgl')
+    replaces=('lib32-nvidia-libgl')
+
+    cd "${srcdir}/${_pkg}/32"
+
+    local library
+    for library in libGLX_nvidia libEGL_nvidia libGLESv1_CM_nvidia libGLESv2_nvidia \
+                   libnvidia-glcore libnvidia-eglcore libnvidia-glsi \
+                   libnvidia-fbc libnvidia-encode libnvidia-ml \
+                   libnvidia-glvkspirv libnvidia-allocator libnvidia-gpucomp \
+                   libnvidia-tls libcuda libnvcuvid libnvidia-nvvm \
+                   libnvidia-ptxjitcompiler libnvidia-opticalflow libnvidia-tileiras; do
+        install -Dm755 "${library}.so.${pkgver}" "${pkgdir}/usr/lib32/${library}.so.${pkgver}"
+    done
+    install -Dm755 "libvdpau_nvidia.so.${pkgver}" \
+        "${pkgdir}/usr/lib32/vdpau/libvdpau_nvidia.so.${pkgver}"
+
+    create_links
+
+    install -dm755 "${pkgdir}/usr/lib32/gbm"
+    ln -s "../libnvidia-allocator.so.${pkgver}" "${pkgdir}/usr/lib32/gbm/nvidia-drm_gbm.so"
+
+    # The matching 64-bit package owns the shared EGL/Vulkan manifests.
+    install -dm755 "${pkgdir}/usr/share/licenses"
+    ln -s nvidia-utils "${pkgdir}/usr/share/licenses/lib32-nvidia-utils"
+}
+
+package_lib32-opencl-nvidia() {
+    pkgdesc="OpenCL implementation for NVIDIA (32-bit)"
+    arch=('x86_64')
+    depends=('lib32-zlib' 'lib32-gcc-libs' "opencl-nvidia=${pkgver}" "nvidia-utils=${pkgver}")
+    optdepends=('opencl-headers: headers necessary for OpenCL development')
+    provides=('lib32-opencl-driver')
+
+    cd "${srcdir}/${_pkg}/32"
+    install -Dm755 "libnvidia-opencl.so.${pkgver}" \
+        "${pkgdir}/usr/lib32/libnvidia-opencl.so.${pkgver}"
+    create_links
+
+    # opencl-nvidia owns the shared /etc/OpenCL/vendors/nvidia.icd file.
+    install -dm755 "${pkgdir}/usr/share/licenses"
+    ln -s nvidia-utils "${pkgdir}/usr/share/licenses/lib32-opencl-nvidia"
 }

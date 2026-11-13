@@ -35,6 +35,18 @@ blacklisted when the proprietary driver (`nvidia-open-dkms`) is actually install
 
 * Provides improved versions of `nvidia-utils`, `opencl-nvidia` and `nvidia-open-dkms` packages for JappeOS.
 
+## 32-bit compatibility packages
+
+On x86_64, the same PKGBUILD also builds `lib32-nvidia-utils` and
+`lib32-opencl-nvidia` from the installer's `32/` directory. They share the
+regular packages' `pkgver` and require matching versions of the regular packages.
+On aarch64, only the original three packages are built.
+
+`lib32-nvidia-utils` provides 32-bit OpenGL/Vulkan support. The optional
+`lib32-opencl-nvidia` provides 32-bit OpenCL and depends on `opencl-nvidia` for
+the shared ICD configuration. Neither installs a kernel module or a nouveau
+blacklist.
+
 ## Role in the OS
 
 Allows Nvidia drivers to be handled cleanly.
